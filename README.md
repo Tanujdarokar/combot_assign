@@ -1,85 +1,162 @@
-# Feature Request & Public Roadmap Portal (FeaturePulse / Canny Clone)
+# FeaturePulse — Feature Request & Public Roadmap Portal
 
-A production-quality, full-stack customer feedback and product roadmap platform built with the MERN stack (MongoDB, Express.js, React.js, Node.js).
-
----
-
-## Features
-
-### 1. Authentication & Security
-- **Secure Dual-Token JWT Auth**: 15-minute access tokens + 7-day refresh tokens stored securely in `httpOnly` cookies.
-- **RBAC**: Role-based access control (`user` and `admin`) with protected API routes and frontend guards.
-- **Password Management**: Signup, login, logout, password reset simulation.
-
-### 2. Feature Request Portal & Feed
-- **Submission Modal**: Rich markdown descriptions, categories (`UI/UX`, `Integrations`, `Performance`, `General`).
-- **Advanced Feed**: Sorting (Most Upvoted, Newest, Most Discussed), category filtering, status filtering, and pagination.
-- **Debounced Search**: Full-text search across titles and descriptions with optimized API calls.
-
-### 3. Atomic Upvoting System
-- **Race-Condition Safe**: MongoDB atomic operators (`$addToSet`, `$pull`, `$inc`) prevent duplicate voting.
-- **Optimistic UI**: Instant state update with automatic rollback on error.
-
-### 4. Threaded Discussions
-- **Comments & Replies**: Full support for nested threaded comments (`parentComment`).
-- **Markdown Support**: Render rich text discussions.
-- **Moderation**: Authors and admins can edit/delete comments.
-
-### 5. Admin Dashboard
-- **Overview Statistics**: Total users, requests, votes, and comments.
-- **Status Workflow**: Manage feature statuses (`Under Review` → `Planned` → `In Progress` → `Completed`) which instantly synchronizes with the public roadmap.
-- **Moderation Tools**: Delete inappropriate posts or comments.
-
-### 6. Public Product Roadmap
-- **3-Column Kanban Board**: Visualizes features by status (`Planned`, `In Progress`, `Completed`) with real-time backend synchronization.
+> A production-ready, full-stack customer feedback, upvoting, and public roadmap platform inspired by Canny and Featurebase.
 
 ---
 
-## Tech Stack
+## 📖 Project Description
 
-- **Frontend**: React.js, Vite, Tailwind CSS, Lucide Icons, React Router DOM, Axios.
-- **Backend**: Node.js, Express.js, JWT, bcryptjs, cookie-parser, CORS.
-- **Database**: MongoDB, Mongoose with advanced indexing.
+**FeaturePulse** is a modern SaaS feedback management portal that bridges the communication gap between users and product teams. It enables users to submit feature requests, upvote ideas they care about, participate in threaded discussions, and track product development milestones on a real-time Kanban roadmap.
+
+Key product capabilities include:
+- **Feature Request Feed**: Search, sort (most upvoted, newest, most discussed), and filter by category or roadmap status.
+- **Atomic Upvoting System**: Race-condition-safe upvoting with optimistic client-side updates and automatic rollback.
+- **Interactive Discussion Board**: Threaded, nested comments with markdown formatting, author tags, and admin moderation.
+- **Interactive Kanban Roadmap**: 3-stage visual development board (`Planned`, `In Progress`, `Completed`) synchronized directly with the database.
+- **Admin Management Dashboard**: Complete oversight of all posts and comments, status lifecycles, and key product engagement metrics.
+- **Secure Dual-Token Authentication**: Access & Refresh token rotation with `httpOnly` secure cookies and role-based access control (RBAC).
 
 ---
 
-## Getting Started
+## 🛠️ Technology Stack Used
 
-### Prerequisites
-- Node.js (v18+)
-- MongoDB running locally or connection URI
+### Frontend
+- **Framework**: [React 18](https://react.dev/) with [Vite](https://vitejs.dev/)
+- **Routing**: [React Router DOM (v6)](https://reactrouter.com/)
+- **Styling**: [Tailwind CSS (v3)](https://tailwindcss.com/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **HTTP Client**: [Axios](https://axios-http.com/) (with interceptors for automated JWT refresh token rotation)
 
-### Installation
+### Backend
+- **Runtime**: [Node.js](https://nodejs.org/) (v18+)
+- **Framework**: [Express.js (v4)](https://expressjs.com/)
+- **Authentication & Security**: [JSON Web Tokens (JWT)](https://jwt.io/), [bcryptjs](https://github.com/dcodeIO/bcrypt.js), `cookie-parser`, `cors`
+- **Configuration**: `dotenv`
+- **Development Tooling**: `nodemon`, `concurrently`
 
-1. **Clone and Install Dependencies**:
+### Database
+- **Database Engine**: [MongoDB](https://www.mongodb.com/) (Local Community Server or MongoDB Atlas)
+- **ODM**: [Mongoose (v8)](https://mongoosejs.com/) with compound indexing and subdocument referencing
+
+---
+
+## 📦 How to Install Dependencies
+
+The project is configured as a multi-package workspace containing both the Express backend and Vite React frontend.
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/Tanujdarokar/combot_assign.git
+   cd combot_assign
+   ```
+
+2. **Install all dependencies (Root + Client)**:
    ```bash
    npm run install:all
    ```
-   *(This installs root dependencies and client dependencies)*
 
-2. **Configure Environment Variables**:
-   Copy `.env.example` to `.env` in the root directory and update values if needed:
-   ```env
-   PORT=5000
-   MONGO_URI=mongodb://localhost:27017/feature_portal
-   JWT_ACCESS_SECRET=your_super_secret_access_key_here
-   JWT_REFRESH_SECRET=your_super_secret_refresh_key_here
-   CLIENT_URL=http://localhost:5173
-   NODE_ENV=development
-   ```
-
-3. **Running the Application (Concurrent Dev)**:
+   *Alternatively, install them manually:*
    ```bash
-   npm run dev
+   # Install server & root dependencies
+   npm install
+
+   # Install client frontend dependencies
+   cd client
+   npm install
+   cd ..
    ```
-   - Frontend: `http://localhost:5173`
-   - Backend: `http://localhost:5000`
 
 ---
 
-## Creating an Admin Account
+## ⚙️ How to Configure Environment Variables
 
-To test admin functionality, register a user account through the frontend (`/signup`), then update their role to `admin` in MongoDB Compass or MongoDB shell:
-```javascript
-db.users.updateOne({ email: "your@email.com" }, { $set: { role: "admin" } });
+Create a `.env` file in the root directory by copying the provided `.env.example`:
+
+```bash
+cp .env.example .env
 ```
+
+Configure the following variables in `.env`:
+
+| Variable | Description | Default / Example Value |
+| :--- | :--- | :--- |
+| `PORT` | Port number for Express backend API | `5000` |
+| `MONGO_URI` | MongoDB connection string URI | `mongodb://127.0.0.1:27017/feature_portal` |
+| `JWT_ACCESS_SECRET` | Secret key used to sign short-lived access tokens (15m) | `your_super_secret_access_key_12345` |
+| `JWT_REFRESH_SECRET` | Secret key used to sign long-lived refresh tokens (7d) | `your_super_secret_refresh_key_12345` |
+| `CLIENT_URL` | Base URL of the client application (for CORS) | `http://localhost:5173` |
+| `NODE_ENV` | Application environment mode (`development` or `production`) | `development` |
+
+---
+
+## 🗄️ Database Setup
+
+Ensure MongoDB is installed and running locally on your machine, or provide a cloud connection string from [MongoDB Atlas](https://www.mongodb.com/atlas).
+
+### 1. Verify MongoDB Service
+```bash
+# Windows (PowerShell / Services)
+Get-Service MongoDB
+
+# macOS / Linux
+sudo systemctl status mongod
+# or with brew
+brew services list
+```
+
+### 2. Seed Database with Realistic Demo Data (Optional but Recommended)
+A database seeding script is provided to populate initial users (Admin and Regular Users), feature requests across all statuses/categories, and nested comments:
+
+```bash
+npm run seed
+```
+
+**Default Demo Accounts Created by Seeder:**
+| Role | Email | Password |
+| :--- | :--- | :--- |
+| **Admin** | `admin@example.com` | `adminpassword123` |
+| **User** | `sarah@example.com` | `userpassword123` |
+| **User** | `alex@example.com` | `userpassword123` |
+
+---
+
+## 🚀 How to Run the Project Locally
+
+You can run both the backend API server and frontend client concurrently with a single command:
+
+```bash
+npm run dev
+```
+
+This starts:
+- **Frontend App**: [http://localhost:5173](http://localhost:5173)
+- **Backend API Server**: [http://localhost:5000](http://localhost:5000)
+
+### Running Services Separately:
+- **Backend Only**:
+  ```bash
+  npm run server
+  ```
+- **Frontend Only**:
+  ```bash
+  npm run client
+  ```
+
+---
+
+## 📌 Assumptions and Limitations
+
+### Assumptions
+1. **Local Authentication Cookies**: `refreshToken` is transmitted as an `httpOnly` cookie. In local development (`NODE_ENV=development`), the `secure` flag is set to `false` to permit standard HTTP localhost traffic. In production, this flag automatically toggles to `true` requiring HTTPS.
+2. **Atomic Upvote Integrity**: It is assumed that an upvote is a binary toggle per user per post. MongoDB's `$addToSet` and `$pull` operators ensure race-condition safety even under rapid parallel clicks.
+3. **Database Availability**: The application assumes an accessible MongoDB instance on startup. If the database connection fails, the server exits with an informative error log.
+
+### Limitations
+1. **Password Reset Flow (Simulation Mode)**: To avoid requiring external third-party SMTP service credentials (e.g. SendGrid / AWS SES) during evaluation, the password reset endpoint securely generates a cryptographic SHA-256 token and returns it in the API response, allowing direct simulation and testing via `/reset-password?token=<TOKEN>`.
+2. **File & Image Attachments**: Current feature requests and comments support rich Markdown text; direct binary image file uploads (e.g. via AWS S3 / Cloudinary) are not currently implemented.
+3. **Email Verification**: User registration flags `isEmailVerified` as `true` by default for instant onboarding during local evaluation.
+
+---
+
+## 📄 License
+This project is open source and available under the [MIT License](LICENSE).
